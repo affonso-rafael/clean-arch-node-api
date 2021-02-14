@@ -106,4 +106,20 @@ describe('SignUp Controller', () => {
     expect(httpResponse.statusCode).toBe(200)
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email)
   })
+
+  test('should return 400 if password and passwordConfirmation is different', () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        name: 'any name',
+        email: 'anyemail@email.com',
+        password: 'password1',
+        passwordConfirmation: 'password'
+      }
+    }
+
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new InvalidParamError('passwordConfirmation'))
+  })
 })
