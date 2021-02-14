@@ -1,6 +1,7 @@
 {
     "extends": "standard-with-typescript",
     "rules": {
+        "@typescript-eslint/strict-boolean-expressions": "off"
     },
     "settings": {},
     "parserOptions": {
