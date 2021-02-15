@@ -1,24 +1,46 @@
+import { CreateAccount, CreateAccountModel } from '../../domain/usecases/create-account'
+import { AccountModel } from '../../domain/usecases/models/account'
 import { InvalidParamError, MissingParamError, ServerError } from '../errors'
 import { EmailValidator } from '../protocols/email-validator'
 import { SignUpController } from './signup-controller'
 
-interface SutTypes {
-  sut: SignUpController
-  emailValidatorStub: EmailValidator
-}
-
-const makeSut = (): SutTypes => {
+const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid(email: string): boolean {
       return true
     }
   }
-  const emailValidatorStub = new EmailValidatorStub()
-  const sut = new SignUpController(emailValidatorStub)
+  return new EmailValidatorStub()
+}
+
+const makeCreateAccount = (): CreateAccount => {
+  class CreateAccount implements CreateAccount {
+    execute(data: CreateAccountModel): AccountModel {
+      return {
+        id: 'anyId',
+        name: 'anyName',
+        email: 'anyEmail',
+        password: 'anyPassword'
+      }
+    }
+  }
+  return new CreateAccount()
+}
+interface SutTypes {
+  sut: SignUpController
+  emailValidatorStub: EmailValidator
+  createAccountStub: CreateAccount
+}
+
+const makeSut = (): SutTypes => {
+  const emailValidatorStub = makeEmailValidator()
+  const createAccountStub = makeCreateAccount()
+  const sut = new SignUpController(emailValidatorStub, createAccountStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    createAccountStub
   }
 }
 
@@ -107,19 +129,23 @@ describe('SignUp Controller', () => {
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email)
   })
 
-  test('should return 400 if password and passwordConfirmation is different', () => {
-    const { sut } = makeSut()
+  test('should call service with correct data', () => {
+    const { sut, createAccountStub } = makeSut()
+    const serviceSpy = jest.spyOn(createAccountStub, 'execute')
     const httpRequest = {
       body: {
         name: 'any name',
         email: 'anyemail@email.com',
-        password: 'password1',
+        password: 'password',
         passwordConfirmation: 'password'
       }
     }
 
-    const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new InvalidParamError('passwordConfirmation'))
+    sut.handle(httpRequest)
+    expect(serviceSpy).toHaveBeenCalledWith({
+      name: 'any name',
+      email: 'anyemail@email.com',
+      password: 'password'
+    })
   })
 })
