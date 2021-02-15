@@ -2,7 +2,8 @@
     "extends": "standard-with-typescript",
     "rules": {
         "@typescript-eslint/strict-boolean-expressions": "off",
-        "@typescript-eslint/space-before-function-paren": "off"
+        "@typescript-eslint/space-before-function-paren": "off",
+        "@typescript-eslint/method-signature-style": "off"
     },
     "settings": {},
     "parserOptions": {
