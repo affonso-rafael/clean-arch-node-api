@@ -80,4 +80,16 @@ describe('DBCreateAccount Usecase', () => {
     await sut.execute(accountData)
     expect(spy).toHaveBeenLastCalledWith({ ...accountData, password: 'hashed_value' })
   })
+
+  test('should throw when createAccountRepositoryStub throw error', async () => {
+    const { sut, createAccountRepositoryStub } = makeSut()
+    jest.spyOn(createAccountRepositoryStub, 'execute').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const accountData = {
+      name: 'valid name',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    }
+    const promisse = sut.execute(accountData)
+    await expect(promisse).rejects.toThrow()
+  })
 })
