@@ -18,9 +18,9 @@ describe('DBCreateAccount Usecase', () => {
     class CreateAccountRepositoryStub implements CreateAccountRepository {
       async execute(data: CreateAccountModel): Promise<AccountModel> {
         const fakeAccount = {
-          id: 'valid id',
-          name: 'valid name',
-          email: 'validemail@email.com',
+          id: 'valid_id',
+          name: 'valid_name',
+          email: 'valid_email@email.com',
           password: 'hashed_value'
         }
         return await new Promise(resolve => resolve(fakeAccount))
@@ -91,5 +91,20 @@ describe('DBCreateAccount Usecase', () => {
     }
     const promisse = sut.execute(accountData)
     await expect(promisse).rejects.toThrow()
+  })
+
+  test('should return account on success', async () => {
+    const { sut } = makeSut()
+
+    const accountData = {
+      name: 'valid_name',
+      email: 'valid_email@email.com',
+      password: 'valid_password'
+    }
+
+    const account = await sut.execute(accountData)
+    expect(account).toEqual({
+      ...accountData, id: 'valid_id', password: 'hashed_value'
+    })
   })
 })
