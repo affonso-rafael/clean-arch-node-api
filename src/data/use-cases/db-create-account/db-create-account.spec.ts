@@ -7,16 +7,17 @@ import { Encrypter } from './protocols/encrypter'
 describe('DBCreateAccount Usecase', () => {
   const makeEncrypter = (): Encrypter => {
     class EncrypterStub implements Encrypter {
-      async encrypt(value: string): Promise<string> {
+      async encrypt (value: string): Promise<string> {
         return await new Promise(resolve => resolve('hashed_value'))
       }
     }
+
     return new EncrypterStub()
   }
 
   const makeCreateAccountRepositorySub = (): CreateAccountRepository => {
     class CreateAccountRepositoryStub implements CreateAccountRepository {
-      async execute(data: CreateAccountModel): Promise<AccountModel> {
+      async execute (data: CreateAccountModel): Promise<AccountModel> {
         const fakeAccount = {
           id: 'valid_id',
           name: 'valid_name',
@@ -26,6 +27,7 @@ describe('DBCreateAccount Usecase', () => {
         return await new Promise(resolve => resolve(fakeAccount))
       }
     }
+
     return new CreateAccountRepositoryStub()
   }
 
@@ -78,7 +80,10 @@ describe('DBCreateAccount Usecase', () => {
       password: 'valid_password'
     }
     await sut.execute(accountData)
-    expect(spy).toHaveBeenLastCalledWith({ ...accountData, password: 'hashed_value' })
+    expect(spy).toHaveBeenLastCalledWith({
+      ...accountData,
+      password: 'hashed_value'
+    })
   })
 
   test('should throw when createAccountRepositoryStub throw error', async () => {
@@ -104,7 +109,9 @@ describe('DBCreateAccount Usecase', () => {
 
     const account = await sut.execute(accountData)
     expect(account).toEqual({
-      ...accountData, id: 'valid_id', password: 'hashed_value'
+      ...accountData,
+      id: 'valid_id',
+      password: 'hashed_value'
     })
   })
 })

@@ -1,21 +1,22 @@
 import { CreateAccount, CreateAccountModel } from '../../domain/usecases/create-account'
 import { AccountModel } from '../../domain/usecases/models/account'
 import { InvalidParamError, MissingParamError, ServerError } from '../errors'
-import { EmailValidator } from '../protocols/email-validator'
+import { EmailValidator } from '../protocols'
 import { SignUpController } from './signup-controller'
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
-    isValid(email: string): boolean {
+    isValid (email: string): boolean {
       return true
     }
   }
+
   return new EmailValidatorStub()
 }
 
 const makeCreateAccount = (): CreateAccount => {
   class CreateAccountStub implements CreateAccount {
-    async execute(data: CreateAccountModel): Promise<AccountModel> {
+    async execute (data: CreateAccountModel): Promise<AccountModel> {
       const account = {
         id: 'anyId',
         name: 'anyName',
@@ -25,8 +26,10 @@ const makeCreateAccount = (): CreateAccount => {
       return new Promise(resolve => resolve(account))
     }
   }
+
   return new CreateAccountStub()
 }
+
 interface SutTypes {
   sut: SignUpController
   emailValidatorStub: EmailValidator
@@ -76,8 +79,26 @@ describe('SignUp Controller', () => {
     expect(httpResponse.statusCode).toBe(200)
   })
 
+  test('should return 400 if password confirmation doesn\'t match is ok', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        name: 'any name',
+        email: 'anyemail@email.com',
+        password: 'password',
+        passwordConfirmation: 'password1'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+  })
+
   test('should return 400 with invalid email', async () => {
-    const { sut, emailValidatorStub } = makeSut()
+    const {
+      sut,
+      emailValidatorStub
+    } = makeSut()
     jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
     const httpRequest = {
       body: {
