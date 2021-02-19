@@ -1,0 +1,10 @@
+import { Express, Router } from 'express'
+import fg from 'fast-glob'
+
+export default function (app: Express): void {
+  const router = Router()
+  app.use(router)
+  fg.sync('**/src/main/routes/**routes.ts').map(async file => {
+    return (await import(`../../../${file}`)).default(router)
+  })
+}
