@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/rhsanet/clean-node-api#readme",
   "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.27",
     "@types/validator": "^13.1.3",
