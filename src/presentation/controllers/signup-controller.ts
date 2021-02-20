@@ -7,12 +7,12 @@ export class SignUpController implements Controller {
   private readonly emailValidator: EmailValidator
   private readonly createAccount: CreateAccount
 
-  constructor(emailValidator: EmailValidator, createAccount: CreateAccount) {
+  constructor (emailValidator: EmailValidator, createAccount: CreateAccount) {
     this.emailValidator = emailValidator
     this.createAccount = createAccount
   }
 
-  async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
+  async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const requiredFields = ['name', 'email', 'password']
       for (const field of requiredFields) {
@@ -35,7 +35,7 @@ export class SignUpController implements Controller {
 
       return successResponse(account)
     } catch (error) {
-      return serverErrorResponse()
+      return serverErrorResponse(error)
     }
   }
 }

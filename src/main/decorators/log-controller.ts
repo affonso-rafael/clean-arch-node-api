@@ -4,6 +4,10 @@ export class LogControllerDecorator implements Controller {
   constructor (private readonly controller: Controller) {}
 
   async handle (request: HttpRequest): Promise<HttpResponse> {
-    return await this.controller.handle(request)
+    const response = await this.controller.handle(request)
+    if (response.statusCode) {
+      console.error(response.body)
+    }
+    return response
   }
 }
