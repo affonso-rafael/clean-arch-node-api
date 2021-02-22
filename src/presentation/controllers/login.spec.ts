@@ -1,7 +1,7 @@
 import { AccessToken, AuthenticationUseCase } from '../../domain/usecases/authentication'
 import { InvalidParamError, MissingParamError } from '../errors'
-import { badRequest, successResponse, serverErrorResponse } from '../helpers/http-helper'
-import { EmailValidator, HttpRequest } from '../protocols'
+import { badRequest, successResponse, serverErrorResponse, unauthorized } from '../helpers/http-helper'
+import { EmailValidator, HttpRequest, HttpResponse } from '../protocols'
 import { LoginController } from './login'
 
 const makeFakeHttpRequest = (): HttpRequest => ({
@@ -53,7 +53,7 @@ describe('Login Controller', () => {
     const { sut } = makeSut()
     const request = makeFakeHttpRequest()
     const response = await sut.handle(request)
-    expect(response).toEqual(successResponse(null))
+    expect(response).toEqual(successResponse({ token: 'token' }))
   })
 
   test('should return 400 if an invalid email is provided', async () => {
@@ -96,5 +96,13 @@ describe('Login Controller', () => {
     const spyAuthenticator = jest.spyOn(authenticationUseCaseStub, 'authenticate')
     await sut.handle(request)
     expect(spyAuthenticator).toHaveBeenCalledWith(request.body.email, request.body.password)
+  })
+
+  test('should return 401 if invalid credentials are provided', async () => {
+    const { sut, authenticationUseCaseStub } = makeSut()
+    const request = makeFakeHttpRequest()
+    jest.spyOn(authenticationUseCaseStub, 'authenticate').mockReturnValueOnce(Promise.resolve(null))
+    const response = await sut.handle(request)
+    expect(response).toEqual(unauthorized())
   })
 })
