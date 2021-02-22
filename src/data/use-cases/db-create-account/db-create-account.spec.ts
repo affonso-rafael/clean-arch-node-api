@@ -1,5 +1,5 @@
 import { CreateAccountModel } from '../../../domain/usecases/create-account'
-import { AccountModel } from '../../../domain/usecases/models/account'
+import { AccountModel } from '../../../domain/models/account'
 import { DBCreateAccount } from './db-create-account'
 import { CreateAccountRepository } from './protocols/create-account-repository'
 import { Encrypter } from './protocols/encrypter'

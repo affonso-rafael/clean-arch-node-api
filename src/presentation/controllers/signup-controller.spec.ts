@@ -1,5 +1,5 @@
 import { CreateAccount, CreateAccountModel } from '../../domain/usecases/create-account'
-import { AccountModel } from '../../domain/usecases/models/account'
+import { AccountModel } from '../../domain/models/account'
 import { InvalidParamError, MissingParamError, ServerError } from '../errors'
 import { EmailValidator, HttpRequest } from '../protocols'
 import { SignUpController } from './signup-controller'
