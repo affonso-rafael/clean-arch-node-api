@@ -1,6 +1,6 @@
 import { AuthenticationUseCase } from '../../domain/usecases/authentication'
 import { InvalidParamError, MissingParamError } from '../errors'
-import { badRequest, serverErrorResponse, successResponse } from '../helpers/http-helper'
+import { badRequest, serverErrorResponse, successResponse, unauthorized } from '../helpers/http-helper'
 import { Controller, EmailValidator, HttpRequest, HttpResponse } from '../protocols'
 
 export class LoginController implements Controller {
@@ -11,20 +11,25 @@ export class LoginController implements Controller {
 
   async handle (request: HttpRequest): Promise<HttpResponse> {
     try {
+      const requiredFields = ['email', 'password']
+      for (const field of requiredFields) {
+        if (!request.body[field]) {
+          return badRequest(new MissingParamError(field))
+        }
+      }
+
       const { email, password } = request.body
-      if (!email) {
-        return badRequest(new MissingParamError('email'))
-      }
-      if (!password) {
-        return badRequest(new MissingParamError('password'))
-      }
       if (!this.emailValidator.isValid(email)) {
         return badRequest(new InvalidParamError('email'))
       }
 
       const auth = await this.authenticationUseCase.authenticate(email, password)
 
-      return Promise.resolve(successResponse(auth))
+      if (!auth) {
+        return unauthorized()
+      }
+
+      return successResponse(auth)
     } catch (error) {
       return serverErrorResponse(error)
     }
